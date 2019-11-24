@@ -1,0 +1,108 @@
+version: '3.7'
+
+services:  
+  node-master:
+    hostname: node-master
+    build:
+      context: .
+    image: hadoop
+    container_name: node-master
+    depends_on:
+      - database
+    volumes:
+      - /mnt/data/docker/hadoop-namenode:/opt/hadoop/data/nameNode
+    ports:
+      - "9870:9870"   # hadoop
+      - "8088:8088"   # hadoop cluster
+      - "9000:9000"   # hdfs
+      - "10000:10000" # hive server2      
+      - "14000:14000" # webhdfs
+    restart: always
+    networks:
+        - cluster
+
+  node1:
+    hostname: node1
+    depends_on:
+      - node-master
+    image: hadoop
+    container_name: node-1
+    ports:
+      - "8001:8042"
+    volumes:
+      - /mnt/data/docker/hadoop-datanode1:/opt/hadoop/data/dataNode
+    restart: always
+    networks:
+      - cluster
+
+  node2:
+    hostname: node2
+    depends_on:
+      - node-master
+    image: hadoop
+    container_name: node-2
+    ports:
+      - "8002:8042"
+    volumes:
+      - /mnt/data/docker/hadoop-datanode2:/opt/hadoop/data/dataNode
+    restart: always
+    networks:
+      - cluster
+      
+  database:
+    hostname: database
+    image: mysql:8.0.17
+    container_name: database
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","root","-psecret"]
+      interval: 30s
+      timeout: 1s
+      retries: 20
+    ports:
+        - "13306:3306"
+    volumes:
+        - /mnt/data/docker/hadoop-mysql:/var/lib/mysql
+    environment:
+        MYSQL_ROOT_USER: root
+        MYSQL_ROOT_PASSWORD: secret
+        MYSQL_DATABASE: hue
+        MYSQL_USER: user
+        MYSQL_PASSWORD: secret
+    restart: always
+    networks:
+      - cluster
+
+  hue:
+    hostname: hue
+    image: gethue/hue:latest
+    container_name: hue
+    dns: 8.8.8.8
+    command: /bin/bash startup.sh
+    depends_on:
+      - database
+    ports:
+    - "8888:8888"
+    volumes:
+      - ./hue/z-hue.ini:/usr/share/hue/desktop/conf/z-hue.ini
+      - ./hue/startup.sh:/usr/share/hue/startup.sh
+    environment:
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_NAME: hue
+      DB_USER: user
+      DB_PASSWORD: secret
+    restart: always
+    networks:
+      - cluster
+      
+  # spark:
+  #   hostname: spark
+  #   build:
+  #     context: spark
+  #   image: spark
+  #   container_name: spark
+  #   networks:
+  #       - cluster
+
+networks:
+  cluster:
