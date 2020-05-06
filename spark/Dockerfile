@@ -19,18 +19,21 @@ RUN echo "export VISIBLE=now" >> /etc/profile
 RUN echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers
 
 # To download Spark
-RUN axel https://archive.apache.org/dist/spark/spark-2.4.0/spark-2.4.0-bin-without-hadoop.tgz
-RUN tar -xvzf spark-2.4.0-bin-without-hadoop.tgz
-RUN mv spark-2.4.0-bin-without-hadoop ./spark
+RUN axel https://archive.apache.org/dist/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.6.tgz
+RUN tar -xvzf spark-2.4.0-bin-hadoop2.6.tgz
+RUN mv spark-2.4.0-bin-hadoop2.6 ./spark
 
 # To download PySpark
 RUN apt-get -qqy install python3-dev python3-pip
 RUN pip3 install pyspark==2.4.4
 
 # To download Java
-RUN axel http://monalisa.cern.ch/MONALISA/download/java/jdk-8u40-linux-x64.tar.gz
-RUN mkdir -p /usr/lib/jvm/
-RUN tar -xzf jdk-8u40-linux-x64.tar.gz -C /usr/lib/jvm/
+RUN apt install -y openjdk-8-jdk
+
+# To Install Scala
+RUN apt-get install -y scala
+
+RUN apt-get install -y python-dev
 
 # BASH FILES
 COPY ./bash_files/* /root/
@@ -42,7 +45,10 @@ RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 RUN chmod 0600 /root/.ssh/id_rsa
 RUN /usr/bin/ssh-keygen -A
 
-# ENTRYPOINT 
+# ENTRYPOINT
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
 RUN chmod +x docker-entrypoint.sh
 ENTRYPOINT ["./docker-entrypoint.sh"]
+
+# PORTS
+EXPOSE 7077 8080 22 4040

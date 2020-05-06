@@ -4,7 +4,7 @@ set -e
 source ~/.bashrc
 
 echo "listing data directories of $(hostname)"
-/bin/ls /opt/hadoop/data
+ls /opt/hadoop/data
 
 echo "Starting sshd service..."
 /etc/init.d/ssh start
@@ -18,7 +18,9 @@ initHiveSchema() {
   }
 }
 
-if [ "$(hostname)" == 'node-master' ]; then
+echo "NodeType: ${nodeType}"
+
+if [ "${nodeType}" == "nameNone" ]; then
     HDFS_ALREADY_FORMATTED=$(find "$HADOOP_HOME/data/nameNode" -mindepth 1 -print -quit 2>/dev/null)
 
     # Checking if HDFS needs to be formated.

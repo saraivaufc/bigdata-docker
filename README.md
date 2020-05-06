@@ -1,4 +1,5 @@
 
+
 # Hadoop Docker
 
 ### Install Docker (Linux Ubuntu):
@@ -28,36 +29,49 @@ $ sudo chmod +x /usr/local/bin/docker-compose
 $ docker-compose build --parallel
 ```
 
-### Up containers
+### Up containers via compose
 ```shell
 $ docker-compose up -d
 ```
 
+### Up containers via swarm
+```shell
+docker swarm init --advertise-addr $(hostname -i)
+docker stack deploy --compose-file docker-compose.yml hadoop
+docker stack ls
+docker stack services SERVICE_NAME
+docker service ps SERVICE_NAME
+docker stack rm hadoop
+```
 
 # Applications
 
-Hadoop  	 - http://localhost:9870
-		
-Cluster:  	 - http://localhost:8088 
+Hadoop  	 - http://127.0.0.1:9870
 
-HDFS    	 - hdfs://localhost:9000
+Cluster:  	- http://127.0.0.1:8088
 
-WEBHDFS 	 - http://localhost:14000/webhdfs/v1
+HDFS    	 - hdfs://127.0.0.1:9000
 
-Hive Server2 - http://localhost:10000
-	
-Hue - http://localhost:8888  
+WEBHDFS 	 - http://127.0.0.1:14000/webhdfs/v1
+
+Hive Server2 - http://127.0.0.1:10000
+
+Hue - http://127.0.0.1:8888
 	Username: hue
 	Password: secret
 
+Spark Master UI - http://127.0.0.1:4080
+
+Spark Application UI - http://127.0.0.1:4040
+
 # Tutorials
 
-### Enter a Namenode container
-```shell
-docker exec -it node-master bash
-```
-
 ## HDFS
+
+### Access the Hadoop Namenode container
+```shell
+docker exec -it hadoop-master bash
+```
 
 ### List root content
 ```shell
@@ -108,6 +122,11 @@ hadoop fs -chmod 777 /user/hue
 
 ## Hive
 
+### Access the Hadoop Namenode container
+```shell
+docker exec -it hadoop-master bash
+```
+
 ### Run Hive Shell
 ```shell
 hive
@@ -126,4 +145,53 @@ hive
 ### List database tables
 ```shell
 > show tables;
+```
+
+## Spark
+
+### Data ingestion in HDFS
+```shell
+# Access the Hadoio Namenode container
+docker exec -it hadoop-master bash
+
+# Download ENEM datasets: http://inep.gov.br/microdados
+
+# create spark folder in HDFS
+hadoop fs -mkdir /user/spark/
+
+# Data ingestion in HDFS
+hadoop fs -put  MICRODADOS_ENEM_2018.csv /user/spark/
+hadoop fs -put  MICRODADOS_ENEM_2017.csv /user/spark/
+```
+### Access the Spark master node container
+```shell
+docker exec -it spark-master bash
+```
+
+### Access Spark shell
+```shell
+spark-shell
+```
+
+### Load ENEM 2018 data from HDFS
+```shell
+val df = spark.read
+	.format("csv")
+	.option("sep", ";")
+	.option("inferSchema", "true")
+	.option("header", "true")
+	.load("hdfs://hadoop-master:9000/user/spark/MICRODADOS_ENEM_2018.csv")
+```
+### Show dataframe schema
+```shell
+df.printSchema()
+```
+### Show how many visually impaired students participated in the ENEM test in 2018.
+```shell
+df.groupBy("IN_CEGUEIRA").count().show()
+```
+
+### Show how many students participated in the ENEM test in 2018 grouped by age.
+```shell
+df.groupBy("NU_IDADE").count().sort(asc("NU_IDADE")).show(100, false)
 ```

@@ -3,7 +3,7 @@
 <configuration>
     <property>
         <name>fs.default.name</name>
-        <value>hdfs://node-master:9000</value>
+        <value>hdfs://hadoop-master:9000</value>
     </property>
 
     <property>

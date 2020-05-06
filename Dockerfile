@@ -34,11 +34,11 @@ RUN dpkg -i mysql-connector-java_8.0.17-1ubuntu18.04_all.deb
 RUN ln -s /usr/share/java/mysql-connector-java-8.0.17.jar /opt/apache-hive/lib/mysql-connector-java.jar
 
 # To fix hive error when startup
-RUN axel http://monalisa.cern.ch/MONALISA/download/java/jdk-8u40-linux-x64.tar.gz
+RUN axel http://monalisa.cern.ch/MONALISA/download/java/jdk-8u172-linux-x64.tar.gz
 RUN mkdir -p /usr/lib/jvm/
-RUN tar -xzf jdk-8u40-linux-x64.tar.gz -C /usr/lib/jvm/
+RUN tar -xzf jdk-8u172-linux-x64.tar.gz -C /usr/lib/jvm/
 
-ENV JAVA_HOME=/usr/lib/jvm/jdk1.8.0_40
+ENV JAVA_HOME=/usr/lib/jvm/jdk1.8.0_172
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # BASH FILES
@@ -62,7 +62,7 @@ RUN /usr/bin/ssh-keygen -A
 # PORTS
 EXPOSE 9870 8088 9000 14000 10000
 
-# ENTRYPOINT 
+# ENTRYPOINT
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
 RUN chmod +x docker-entrypoint.sh
 ENTRYPOINT ["./docker-entrypoint.sh"]
