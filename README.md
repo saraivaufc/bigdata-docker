@@ -1,6 +1,4 @@
-
-
-# Hadoop Docker
+![bigdata-docker](./docs/bigdata-docker.png)
 
 ### Install Docker (Linux Ubuntu):
 
