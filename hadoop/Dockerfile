@@ -33,13 +33,8 @@ RUN axel https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-java_8.
 RUN dpkg -i mysql-connector-java_8.0.17-1ubuntu18.04_all.deb
 RUN ln -s /usr/share/java/mysql-connector-java-8.0.17.jar /opt/apache-hive/lib/mysql-connector-java.jar
 
-# To fix hive error when startup
-RUN axel http://monalisa.cern.ch/MONALISA/download/java/jdk-8u172-linux-x64.tar.gz
-RUN mkdir -p /usr/lib/jvm/
-RUN tar -xzf jdk-8u172-linux-x64.tar.gz -C /usr/lib/jvm/
-
-ENV JAVA_HOME=/usr/lib/jvm/jdk1.8.0_172
-ENV PATH="${JAVA_HOME}/bin:${PATH}"
+# To download Java
+RUN apt install -y openjdk-8-jdk
 
 # BASH FILES
 COPY ./bash_files/* /root/
@@ -48,12 +43,10 @@ COPY ./bash_files/* /root/
 COPY ./hadoop-conf-files/* ./hadoop/etc/hadoop/
 
 # HIVE FILES
-COPY ./hive/hive-site.xml apache-hive/conf/hive-site.xml
-
-# RUN echo "export JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:bin/java::")" | tee -a ./hadoop/etc/hadoop/hadoop-env.sh && echo $JAVA_HOME
+COPY ./hive-conf-files/hive-site.xml apache-hive/conf/hive-site.xml
 
 # SSH Keys
-RUN mkdir -p /root/.ssh/
+RUN mkdir -p /root/.ssh/s
 COPY ./ssh_keys/* /root/.ssh/
 RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 RUN chmod 0600 /root/.ssh/id_rsa

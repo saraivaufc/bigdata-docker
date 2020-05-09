@@ -8,7 +8,7 @@ fi
 export HADOOP_HOME=/opt/hadoop
 
 #Hadoop variables
-export JAVA_HOME=/usr/lib/jvm/jdk1.8.0_172/
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
 
 # SET HADOOP

@@ -4,7 +4,7 @@ services:
   hadoop-master:
     hostname: hadoop-master
     build:
-      context: .
+      context: hadoop
     image: hadoop
     container_name: hadoop-master
     depends_on:
