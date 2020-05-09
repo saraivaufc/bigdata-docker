@@ -23,6 +23,9 @@ echo "NodeType: ${nodeType}"
 if [ "${nodeType}" == "nameNone" ]; then
     HDFS_ALREADY_FORMATTED=$(find "$HADOOP_HOME/data/nameNode" -mindepth 1 -print -quit 2>/dev/null)
 
+    echo "Stopping HDFS..."
+    $HADOOP_HOME/sbin/stop-all.sh
+
     # Checking if HDFS needs to be formated.
     if [ !  $HDFS_ALREADY_FORMATTED ]; then
         echo "FORMATTING NAMENODE"
@@ -31,16 +34,6 @@ if [ "${nodeType}" == "nameNone" ]; then
 
     echo "Starting HDFS.."
     $HADOOP_HOME/sbin/start-dfs.sh
-
-    # Create non-existing folders
-    $HADOOP_HOME/bin/hadoop fs -mkdir -p    /tmp
-    $HADOOP_HOME/bin/hadoop fs -mkdir -p    /user/hive/warehouse
-    $HADOOP_HOME/bin/hadoop fs -chmod 777   /tmp
-    $HADOOP_HOME/bin/hadoop fs -chmod 777   /user/hive/warehouse
-
-    # Create hue directories
-    $HADOOP_HOME/bin/hadoop fs -mkdir -p /user/hue
-    $HADOOP_HOME/bin/hadoop fs -chmod 777 /user/hue
 
     echo "Initializing hive..."
     /bin/bash  /opt/apache-hive/bin/init-hive-dfs.sh
@@ -56,6 +49,18 @@ if [ "${nodeType}" == "nameNone" ]; then
 
     echo "Starting webhttp hadoop service..."
     $HADOOP_HOME/bin/hdfs httpfs &
+
+    echo "Create directories..."
+    #Create non-existing folders
+    $HADOOP_HOME/bin/hadoop fs -mkdir -p    /tmp
+    $HADOOP_HOME/bin/hadoop fs -mkdir -p    /user/hive/warehouse
+    $HADOOP_HOME/bin/hadoop fs -chmod 777   /tmp
+    $HADOOP_HOME/bin/hadoop fs -chmod 777   /user/hive/warehouse
+
+    # Create hue directories
+    $HADOOP_HOME/bin/hadoop fs -mkdir -p /user/hue
+    $HADOOP_HOME/bin/hadoop fs -chmod 777 /user/hue
+
 fi
 
 

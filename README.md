@@ -175,12 +175,7 @@ spark-shell
 
 ### Load ENEM 2018 data from HDFS
 ```shell
-val df = spark.read
-	.format("csv")
-	.option("sep", ";")
-	.option("inferSchema", "true")
-	.option("header", "true")
-	.load("hdfs://hadoop-master:9000/user/spark/MICRODADOS_ENEM_2018.csv")
+val df = spark.read.format("csv").option("sep", ";").option("inferSchema", "true").option("header", "true").load("hdfs://hadoop-master:9000/user/spark/MICRODADOS_ENEM_2018.csv")
 ```
 ### Show dataframe schema
 ```shell

@@ -9,6 +9,7 @@ services:
     container_name: hadoop-master
     depends_on:
       - database
+      - hadoop-datanode
     environment:
       - nodeType=nameNone
     volumes:
@@ -25,8 +26,6 @@ services:
 
   hadoop-datanode:
     hostname: hadoop-datanode
-    depends_on:
-      - hadoop-master
     image: hadoop
     deploy:
       mode: replicated
@@ -98,6 +97,7 @@ services:
       context: spark
     image: spark
     container_name: spark-master
+    restart: always
     environment:
       - nodeType=master
     ports:
@@ -114,6 +114,7 @@ services:
       mode: replicated
       replicas: 2
     container_name: spark-slave
+    restart: always
     environment:
       - nodeType=slave
     networks:
