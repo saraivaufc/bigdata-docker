@@ -101,8 +101,13 @@ services:
     environment:
       - nodeType=master
     ports:
-      - "4040:4040"
+      - "4040:4040" # spark ui
       - "4080:8080"
+      - "8998:8998" # livy rest
+      - "8899:8899" # jupyter
+    volumes:
+      - /mnt/data/jupyter-data:/opt/notebook/data
+      - jupyter-scripts:/opt/notebook/scripts
     networks:
       - cluster
 
@@ -122,3 +127,6 @@ services:
 
 networks:
   cluster:
+
+volumes:
+  jupyter-scripts:

@@ -9,6 +9,9 @@ echo "Starting sshd service..."
 if [ "${nodeType}" == 'master' ]; then
   echo "Start Spark master"
   /opt/spark/sbin/start-master.sh -h spark-master
+
+  echo "Start jupyter"
+  jupyter notebook --ip=0.0.0.0 --port=8899 --no-browser --allow-root --NotebookApp.allow_password_change=False --notebook-dir="./notebook"
 else
   echo "Start Spark slave"
   /opt/spark/sbin/start-slave.sh spark://spark-master:7077 -m 1024m -c 2

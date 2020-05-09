@@ -60,7 +60,11 @@ Hue - http://127.0.0.1:8888
 
 Spark Master UI - http://127.0.0.1:4080
 
-Spark Application UI - http://127.0.0.1:4040
+Spark Jobs - http://127.0.0.1:4040
+
+Livy - http://127.0.0.1:8998
+
+Jupyter notebook - http://127.0.0.1:8899
 
 # Tutorials
 
@@ -146,6 +150,8 @@ hive
 ```
 
 ## Spark
+
+Documentation: https://spark.apache.org/docs/latest/api/python/pyspark.sql.html?highlight=read%20csv
 
 ### Data ingestion in HDFS
 ```shell

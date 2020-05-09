@@ -11,13 +11,11 @@ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 # SET HADOOP
 export SPARK_HOME=/opt/spark
 
-# SET HADOOP
-export HADOOP_HOME="/opt/hadoop"
-export HADOOP_USER_NAME="root"
-export HADOOP_MAPRED_HOME=$HADOOP_HOME
-export HADOOP_COMMON_HOME=$HADOOP_HOME
-export HADOOP_HDFS_HOME=$HADOOP_HOME
-export HADOOP_LIBEXEC_DIR=${HADOOP_HOME}/libexec
+export IPYTHON=1
+export PYSPARK_PYTHON=/usr/bin/python3
+export PYSPARK_DRIVER_PYTHON=jupyter
+export PYSPARK_DRIVER_PYTHON_OPTS='notebook'
+export PYSPARK_SUBMIT_ARGS="--master local[2] pyspark-shell"
 
 # PATH
-export PATH=${PATH}:${JAVA_HOME}:${SPARK_HOME}/bin:${HADOOP_HOME}/bin:${HADOOP_HOME}/sbin:${HADOOP_MAPRED_HOME}:${HADOOP_COMMON_HOME}:${HADOOP_HDFS_HOME}:${HADOOP_LIBEXEC_DIR}
+export PATH=${PATH}:${JAVA_HOME}:${SPARK_HOME}/bin
