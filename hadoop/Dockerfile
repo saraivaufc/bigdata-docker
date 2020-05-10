@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-MAINTAINER saraiva.ufc@gmail.com
+MAINTAINER saraivaufc <www.saraiva.dev>
 
 WORKDIR /opt/
 
@@ -17,6 +17,13 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 RUN echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers
+
+# SSH Keys
+RUN mkdir -p /root/.ssh/s
+COPY ./ssh_keys/* /root/.ssh/
+RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
+RUN chmod 0600 /root/.ssh/id_rsa
+RUN /usr/bin/ssh-keygen -A
 
 # To download Hadoop
 RUN axel https://archive.apache.org/dist/hadoop/common/hadoop-3.1.2/hadoop-3.1.2.tar.gz
@@ -44,13 +51,6 @@ COPY ./hadoop-conf-files/* ./hadoop/etc/hadoop/
 
 # HIVE FILES
 COPY ./hive-conf-files/hive-site.xml apache-hive/conf/hive-site.xml
-
-# SSH Keys
-RUN mkdir -p /root/.ssh/s
-COPY ./ssh_keys/* /root/.ssh/
-RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
-RUN chmod 0600 /root/.ssh/id_rsa
-RUN /usr/bin/ssh-keygen -A
 
 # PORTS
 EXPOSE 9870 8088 9000 14000 10000

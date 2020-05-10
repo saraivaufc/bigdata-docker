@@ -25,45 +25,31 @@ RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 RUN chmod 0600 /root/.ssh/id_rsa
 RUN /usr/bin/ssh-keygen -A
 
-# To download Spark
-RUN axel https://archive.apache.org/dist/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.6.tgz
-RUN tar -xvzf spark-2.4.0-bin-hadoop2.6.tgz
-RUN mv spark-2.4.0-bin-hadoop2.6 ./spark
-
 # To download Java
 RUN apt install -y openjdk-8-jdk
 
-# To download PySpark
-RUN apt-get -qqy install python3-dev python3-pip
-RUN pip3 install pyspark==2.4.4
-
-# To Install Scala
-RUN apt-get install -y scala
-
-# To Install Jupyter
-RUN pip3 install --upgrade pip
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-
-# To Install Scala Kernel to Jupyter
-RUN pip3 install spylon-kernel
-RUN python3 -m spylon_kernel install
-
-# Configure Jupyter
-RUN mkdir notebook
-RUN mkdir -p /root/.jupyter
-RUN echo "from IPython.lib import passwd;c.NotebookApp.password = passwd('secret')" >> /root/.jupyter/jupyter_notebook_config.py
+# To install ZooKeeper
+RUN apt install -y zookeeperd
 
 # BASH FILES
 COPY ./bash_files/* /root/
+
+# default parameters for config file:
+ENV tickTime=2000
+ENV dataDir=/var/lib/zookeeper/
+ENV dataLogDir=/var/log/zookeeper/
+ENV clientPort=2181
+ENV initLimit=5
+ENV syncLimit=2
 
 # ENTRYPOINT
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
 RUN chmod +x docker-entrypoint.sh
 ENTRYPOINT ["./docker-entrypoint.sh"]
 
-# PORTS
-EXPOSE 7077 8080 22 4040 8998
 
-# Expose Jupyter port
-EXPOSE 8899
+# The port to listen for client connections
+EXPOSE 2181
+
+# Peers use the former port to connect to other peers
+EXPOSE 2888 3888

@@ -123,7 +123,61 @@ services:
     environment:
       - nodeType=slave
     networks:
-        - cluster
+      - cluster
+
+  zookeeper:
+    hostname: zookeeper
+    build:
+      context: zookeeper
+    image: zookeeper
+    restart: always
+    container_name: zookeeper
+    command: zookeeper,zookeeper-2 1
+    environment:
+      - constraint:node==zookeeper
+    ports:
+      - 2181:2181
+    networks:
+      - cluster
+
+  zookeeper-2:
+    hostname: zookeeper-2
+    image: zookeeper
+    restart: always
+    command: zookeeper,zookeeper-2 2
+    container_name: zookeeper-2
+    networks:
+      - cluster
+
+  kafka-broker1:
+    depends_on:
+      - zookeeper
+    hostname: kafka-broker1
+    build:
+      context: kafka
+    image: kafka
+    container_name: kafka-broker1
+    restart: always
+    command: kafka-broker1,kafka-broker2 1
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+    ports:
+      - "9091:9091"
+    networks:
+      - cluster
+
+  kafka-broker2:
+    depends_on:
+      - zookeeper
+    hostname: kafka-broker2
+    image: kafka
+    container_name: kafka-broker2
+    restart: always
+    command: kafka-broker1,kafka-broker2 2
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+    networks:
+      - cluster
 
 networks:
   cluster:

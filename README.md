@@ -194,3 +194,44 @@ df.groupBy("IN_CEGUEIRA").count().show()
 ```shell
 df.groupBy("NU_IDADE").count().sort(asc("NU_IDADE")).show(100, false)
 ```
+
+## Kafka
+
+### Connect Kafka Broker 1
+```shell
+docker exec -it kafka-broker1 bash
+```
+
+### Create topic
+```shell
+kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic test
+```
+
+### List topics
+```shell
+kafka-topics.sh --zookeeper zookeeper:2181 --list
+```
+
+### Run Producer on Kafka Broker 1
+```shell
+kafka-console-producer.sh --bootstrap-server kafka-broker1:9091 --topic test
+```
+### Enter data
+```shell
+>Hello
+```
+
+### Connect Kafka Broker 2
+```shell
+docker exec -it kafka-broker2 bash
+```
+
+### Run Consumer on Kafka Broker 2
+```shell
+kafka-console-consumer.sh --bootstrap-server kafka-broker1:9091 --from-beginning --topic test
+```
+
+### Delete topic
+```shell
+kafka-topics.sh --zookeeper zookeeper:2181 --delete --topic test
+```

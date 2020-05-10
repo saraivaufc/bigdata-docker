@@ -25,45 +25,27 @@ RUN cat /root/.ssh/id_rsa.pub >> /root/.ssh/authorized_keys
 RUN chmod 0600 /root/.ssh/id_rsa
 RUN /usr/bin/ssh-keygen -A
 
-# To download Spark
-RUN axel https://archive.apache.org/dist/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.6.tgz
-RUN tar -xvzf spark-2.4.0-bin-hadoop2.6.tgz
-RUN mv spark-2.4.0-bin-hadoop2.6 ./spark
-
 # To download Java
 RUN apt install -y openjdk-8-jdk
 
-# To download PySpark
-RUN apt-get -qqy install python3-dev python3-pip
-RUN pip3 install pyspark==2.4.4
-
-# To Install Scala
-RUN apt-get install -y scala
-
-# To Install Jupyter
-RUN pip3 install --upgrade pip
-COPY requirements.txt requirements.txt
-RUN pip3 install -r requirements.txt
-
-# To Install Scala Kernel to Jupyter
-RUN pip3 install spylon-kernel
-RUN python3 -m spylon_kernel install
-
-# Configure Jupyter
-RUN mkdir notebook
-RUN mkdir -p /root/.jupyter
-RUN echo "from IPython.lib import passwd;c.NotebookApp.password = passwd('secret')" >> /root/.jupyter/jupyter_notebook_config.py
+# To download Kafka
+RUN axel http://mirror.nbtelecom.com.br/apache/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+RUN tar -xvzf kafka_2.12-2.5.0.tgz
+RUN mv kafka_2.12-2.5.0 ./kafka
 
 # BASH FILES
 COPY ./bash_files/* /root/
+
+# KAFKA FILES
+COPY ./kafka-conf-files/* ./kafka/conf/
 
 # ENTRYPOINT
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
 RUN chmod +x docker-entrypoint.sh
 ENTRYPOINT ["./docker-entrypoint.sh"]
 
-# PORTS
-EXPOSE 7077 8080 22 4040 8998
+# Input
+EXPOSE 19091 19092
 
-# Expose Jupyter port
-EXPOSE 8899
+# Output
+EXPOSE 9091 9092
