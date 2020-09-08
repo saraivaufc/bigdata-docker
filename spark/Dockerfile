@@ -26,12 +26,12 @@ RUN chmod 0600 /root/.ssh/id_rsa
 RUN /usr/bin/ssh-keygen -A
 
 # To download Spark
-RUN axel https://archive.apache.org/dist/spark/spark-2.4.0/spark-2.4.0-bin-hadoop2.6.tgz
-RUN tar -xvzf spark-2.4.0-bin-hadoop2.6.tgz
-RUN mv spark-2.4.0-bin-hadoop2.6 ./spark
+RUN axel https://archive.apache.org/dist/spark/spark-3.0.1/spark-3.0.1-bin-hadoop3.2.tgz
+RUN tar -xvzf spark-3.0.1-bin-hadoop3.2.tgz
+RUN mv spark-3.0.1-bin-hadoop3.2 ./spark
 
 # To download Java
-RUN apt-get update && apt install -y openjdk-8-jdk
+RUN apt-get update && apt install -y openjdk-11-jdk
 
 # To download PySpark
 RUN apt-get -qqy install python3-dev python3-pip

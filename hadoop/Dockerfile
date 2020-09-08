@@ -41,7 +41,7 @@ RUN dpkg -i mysql-connector-java_8.0.17-1ubuntu18.04_all.deb
 RUN ln -s /usr/share/java/mysql-connector-java-8.0.17.jar /opt/apache-hive/lib/mysql-connector-java.jar
 
 # To download Java
-RUN apt install -y openjdk-8-jdk
+RUN apt update && apt install -y openjdk-8-jdk
 
 # BASH FILES
 COPY ./bash_files/* /root/

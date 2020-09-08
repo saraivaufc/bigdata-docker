@@ -26,7 +26,7 @@ RUN chmod 0600 /root/.ssh/id_rsa
 RUN /usr/bin/ssh-keygen -A
 
 # To download Java
-RUN apt install -y openjdk-8-jdk
+RUN apt update && apt install -y openjdk-8-jdk
 
 # To install ZooKeeper
 RUN apt install -y zookeeperd

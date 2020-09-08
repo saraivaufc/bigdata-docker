@@ -26,7 +26,7 @@ RUN chmod 0600 /root/.ssh/id_rsa
 RUN /usr/bin/ssh-keygen -A
 
 # To download Java
-RUN apt install -y openjdk-8-jdk
+RUN apt update && apt install -y openjdk-8-jdk
 
 # To download Kafka
 RUN axel http://mirror.nbtelecom.com.br/apache/kafka/2.5.0/kafka_2.12-2.5.0.tgz
