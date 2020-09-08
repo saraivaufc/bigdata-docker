@@ -13,7 +13,7 @@ services:
     environment:
       - nodeType=nameNone
     volumes:
-      - /mnt/data/docker/hadoop-namenode:/opt/hadoop/data/nameNode
+      - hadoop-namenode:/opt/hadoop/data/nameNode
     ports:
       - "9870:9870"   # hadoop
       - "8088:8088"   # hadoop cluster
@@ -36,7 +36,7 @@ services:
     ports:
       - "8001:8042"
     volumes:
-      - /mnt/data/docker/hadoop-datanode:/opt/hadoop/data/dataNode
+      - hadoop-datanode:/opt/hadoop/data/dataNode
     restart: always
     networks:
       - cluster
@@ -55,7 +55,7 @@ services:
     ports:
         - "13306:3306"
     volumes:
-        - /mnt/data/docker/hadoop-mysql:/var/lib/mysql
+        - hadoop-mysql:/var/lib/mysql
     environment:
         MYSQL_ROOT_USER: root
         MYSQL_ROOT_PASSWORD: secret
@@ -106,7 +106,7 @@ services:
       - "8998:8998" # livy rest
       - "8899:8899" # jupyter
     volumes:
-      - /mnt/data/jupyter-data:/opt/notebook/data
+      - jupyter-data:/opt/notebook/data
       - jupyter-scripts:/opt/notebook/scripts
     networks:
       - cluster
@@ -184,3 +184,7 @@ networks:
 
 volumes:
   jupyter-scripts:
+  hadoop-namenode:
+  hadoop-datanode:
+  hadoop-mysql:
+  jupyter-data:

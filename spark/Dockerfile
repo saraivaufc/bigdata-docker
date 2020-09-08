@@ -31,7 +31,7 @@ RUN tar -xvzf spark-2.4.0-bin-hadoop2.6.tgz
 RUN mv spark-2.4.0-bin-hadoop2.6 ./spark
 
 # To download Java
-RUN apt install -y openjdk-8-jdk
+RUN apt-get update && apt install -y openjdk-8-jdk
 
 # To download PySpark
 RUN apt-get -qqy install python3-dev python3-pip
@@ -56,6 +56,9 @@ RUN echo "from IPython.lib import passwd;c.NotebookApp.password = passwd('secret
 
 # BASH FILES
 COPY ./bash_files/* /root/
+
+# COPY ENVIROMENT VARIABLES
+COPY ./spark-env.sh ./spark/conf/
 
 # ENTRYPOINT
 COPY ./docker-entrypoint.sh docker-entrypoint.sh

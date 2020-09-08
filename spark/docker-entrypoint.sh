@@ -14,7 +14,7 @@ if [ "${nodeType}" == 'master' ]; then
   jupyter notebook --ip=0.0.0.0 --port=8899 --no-browser --allow-root --NotebookApp.allow_password_change=False --notebook-dir="./notebook"
 else
   echo "Start Spark slave"
-  /opt/spark/sbin/start-slave.sh spark://spark-master:7077 -m 1024m -c 2
+  /opt/spark/sbin/start-slave.sh spark://spark-master:7077
 fi
 
 while true;
