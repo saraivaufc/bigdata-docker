@@ -21,6 +21,44 @@ $ sudo curl -L "https://github.com/docker/compose/releases/download/1.23.2/docke
 $ sudo chmod +x /usr/local/bin/docker-compose
 ```
 
+### To use GPU
+
+Install NVIDIA Docker 2
+```shell
+$ sudo apt-get install -y nvidia-docker2 nvidia-container-toolkit
+```
+
+Update /etc/docker/daemon.json
+
+From:
+```json
+{
+    "runtimes": {
+        "nvidia": {
+            "path": "nvidia-container-runtime",
+            "runtimeArgs": []
+        }
+    }
+}
+```
+To:
+```json
+{
+	"default-runtime":"nvidia",
+    "runtimes": {
+        "nvidia": {
+            "path": "nvidia-container-runtime",
+            "runtimeArgs": []
+        }
+    }
+}
+```
+
+Restart Docker
+```shell
+$ service docker restart
+```
+
 
 ### Build images
 ```shell

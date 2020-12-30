@@ -90,7 +90,6 @@ services:
     restart: always
     networks:
       - cluster
-
   spark-master:
     hostname: spark-master
     build:
@@ -100,6 +99,8 @@ services:
     restart: always
     environment:
       - nodeType=master
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
     ports:
       - "4040:4040" # spark ui
       - "4080:8080"
@@ -115,13 +116,14 @@ services:
     build:
       context: spark
     image: spark
+    container_name: spark-slave
     deploy:
       mode: replicated
       replicas: 2
-    container_name: spark-slave
     restart: always
     environment:
       - nodeType=slave
+      - NVIDIA_VISIBLE_DEVICES=all
     networks:
       - cluster
 

@@ -1,4 +1,5 @@
-FROM ubuntu:18.04
+#FROM ubuntu:18.04
+FROM tensorflow/tensorflow:latest-gpu-py3-jupyter
 
 MAINTAINER saraivaufc <www.saraiva.dev>
 
@@ -53,6 +54,9 @@ RUN python3 -m spylon_kernel install
 RUN mkdir notebook
 RUN mkdir -p /root/.jupyter
 RUN echo "from IPython.lib import passwd;c.NotebookApp.password = passwd('secret')" >> /root/.jupyter/jupyter_notebook_config.py
+
+# To install graphviz
+RUN apt install -y graphviz
 
 # BASH FILES
 COPY ./bash_files/* /root/
