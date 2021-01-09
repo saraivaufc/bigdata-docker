@@ -63,6 +63,8 @@ COPY ./bash_files/* /root/
 
 # COPY ENVIROMENT VARIABLES
 COPY ./spark-env.sh ./spark/conf/
+COPY ./spark-defaults.conf ./spark/conf/
+COPY ./getGpusResources.sh ./spark/conf/
 
 # ENTRYPOINT
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
