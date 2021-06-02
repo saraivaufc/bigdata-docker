@@ -20,6 +20,8 @@ export PYSPARK_DRIVER_PYTHON=jupyter
 export PYSPARK_DRIVER_PYTHON_OPTS='notebook'
 #export PYSPARK_SUBMIT_ARGS="--master local[*] pyspark-shell"
 export PYSPARK_SUBMIT_ARGS="--master spark://spark-master:7077 pyspark-shell"
-
 # PATH
 export PATH=${PATH}:${JAVA_HOME}:${SPARK_HOME}/bin
+
+export SPARK_WORKER_CORES=16
+export SPARK_EXECUTOR_CORES=16

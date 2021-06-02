@@ -1,6 +1,6 @@
 ![bigdata-docker](./docs/bigdata-docker.png)
 
-### Install Docker (Linux Ubuntu):
+### Install Docker (Ubuntu):
 
 ```shell
 $ sudo apt-get remove docker docker-engine docker.io
@@ -23,12 +23,12 @@ $ sudo chmod +x /usr/local/bin/docker-compose
 
 ### To use GPU
 
-Install NVIDIA Docker 2
+#### Install NVIDIA Docker 2
 ```shell
 $ sudo apt-get install -y nvidia-docker2 nvidia-container-toolkit
 ```
 
-Update /etc/docker/daemon.json
+#### Update /etc/docker/daemon.json
 
 From:
 ```json
@@ -54,7 +54,7 @@ To:
 }
 ```
 
-Restart Docker
+#### Restart Docker
 ```shell
 $ service docker restart
 ```
@@ -70,39 +70,22 @@ $ docker-compose build --parallel
 $ docker-compose up -d
 ```
 
-### Up containers via swarm
-```shell
-docker swarm init --advertise-addr $(hostname -i)
-docker stack deploy --compose-file docker-compose.yml hadoop
-docker stack ls
-docker stack services SERVICE_NAME
-docker service ps SERVICE_NAME
-docker stack rm hadoop
-```
-
 # Applications
 
-Hadoop  	 - http://127.0.0.1:9870
-
-Cluster:  	- http://127.0.0.1:8088
-
-HDFS    	 - hdfs://127.0.0.1:9000
-
-WEBHDFS 	 - http://127.0.0.1:14000/webhdfs/v1
-
-Hive Server2 - http://127.0.0.1:10000
-
-Hue - http://127.0.0.1:8888
-	Username: hue
-	Password: secret
-
-Spark Master UI - http://127.0.0.1:4080
-
-Spark Jobs - http://127.0.0.1:4040
-
-Livy - http://127.0.0.1:8998
-
-Jupyter notebook - http://127.0.0.1:8899
+| Application | URL |
+|-----------------------|-------------------------------------------------------|
+| Hadoop                | http://localhost:9870                                 |
+| Hadoop Cluster        | http://localhost:8088                                 |
+| Hadoop HDFS           | hdfs://localhost:9000                                 |
+| Hadoop WEBHDFS        | http://localhost:14000/webhdfs/v1                     |
+| Hive Server2          | http://localhost:10000                                |
+| Hue                   | http://localhost:8888 (Username: hue,password: secret)|
+| Spark Master UI       | http://localhost:4080                                 |
+| Spark Jobs            | http://localhost:4040                                 |
+| Livy                  | http://localhost:8998                                 |
+| Jupyter notebook      | http://localhost:8899                                 |
+| AirFlow               | http://localhost:8080                                 |
+| Flower                | http://localhost:8555                                 |
 
 # Tutorials
 

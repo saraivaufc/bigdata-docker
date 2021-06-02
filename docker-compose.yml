@@ -1,6 +1,80 @@
 version: '3.7'
 
+x-airflow-common:
+  &airflow-common
+  image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.1.0}
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    AIRFLOW__API__AUTH_BACKEND: 'airflow.api.auth.backend.basic_auth'
+  volumes:
+    - airflow-dags:/opt/airflow/dags
+    - airflow-logs:/opt/airflow/logs
+    - airflow-plugins:/opt/airflow/plugins
+  user: "${AIRFLOW_UID:-50000}:${AIRFLOW_GID:-50000}"
+  depends_on:
+    - redis
+    - postgres
+
+
 services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 5s
+      retries: 5
+    restart: always
+    networks:
+      - cluster
+
+  mysql:
+    image: mysql:8.0.17
+    container_name: mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","root","-psecret"]
+      interval: 30s
+      timeout: 1s
+      retries: 20
+    ports:
+        - "13306:3306"
+    volumes:
+        - mysql-db:/var/lib/mysql
+    environment:
+        MYSQL_ROOT_USER: ${MYSQL_ROOT_USER}
+        MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    restart: always
+    networks:
+      - cluster
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    networks:
+      - cluster
+
   hadoop-master:
     hostname: hadoop-master
     build:
@@ -8,7 +82,7 @@ services:
     image: hadoop
     container_name: hadoop-master
     depends_on:
-      - database
+      - mysql
       - hadoop-datanode
     environment:
       - nodeType=nameNone
@@ -27,9 +101,6 @@ services:
   hadoop-datanode:
     hostname: hadoop-datanode
     image: hadoop
-    deploy:
-      mode: replicated
-      replicas: 2
     container_name: hadoop-datanode
     environment:
       - nodeType=dataNone
@@ -41,55 +112,27 @@ services:
     networks:
       - cluster
 
-  database:
-    image: mysql:8.0.17
-    deploy:
-      mode: replicated
-      replicas: 1
-    container_name: database
-    healthcheck:
-      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost","-u","root","-psecret"]
-      interval: 30s
-      timeout: 1s
-      retries: 20
-    ports:
-        - "13306:3306"
-    volumes:
-        - hadoop-mysql:/var/lib/mysql
-    environment:
-        MYSQL_ROOT_USER: root
-        MYSQL_ROOT_PASSWORD: secret
-        MYSQL_DATABASE: hue
-        MYSQL_USER: user
-        MYSQL_PASSWORD: secret
-    restart: always
-    networks:
-      - cluster
-
   hue:
     image: gethue/hue:latest
-    deploy:
-      mode: replicated
-      replicas: 1
     container_name: hue
-    dns: 8.8.8.8
     command: /bin/bash startup.sh
     depends_on:
-      - database
+      - mysql
     ports:
       - "8888:8888"
     volumes:
       - ./hue/z-hue.ini:/usr/share/hue/desktop/conf/z-hue.ini
       - ./hue/startup.sh:/usr/share/hue/startup.sh
     environment:
-      DB_HOST: database
-      DB_PORT: 3306
-      DB_NAME: hue
-      DB_USER: user
-      DB_PASSWORD: secret
+      DB_HOST: ${MYSQL_HOST}
+      DB_PORT: ${MYSQL_PORT}
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
     restart: always
     networks:
       - cluster
+
   spark-master:
     hostname: spark-master
     build:
@@ -117,9 +160,6 @@ services:
       context: spark
     image: spark
     container_name: spark-slave
-    deploy:
-      mode: replicated
-      replicas: 2
     restart: always
     environment:
       - nodeType=slave
@@ -181,12 +221,87 @@ services:
     networks:
       - cluster
 
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    command: webserver
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - cluster
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - cluster
+
+  airflow-worker:
+    <<: *airflow-common
+    container_name: airflow-worker
+    command: celery worker
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - cluster
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow-init
+    command: version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+    networks:
+      - cluster
+
+  flower:
+    <<: *airflow-common
+    container_name: flower
+    command: celery flower
+    ports:
+      - 8555:5555
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    networks:
+      - cluster
+
 networks:
   cluster:
 
 volumes:
-  jupyter-scripts:
+  postgres-db:
+  mysql-db:
   hadoop-namenode:
   hadoop-datanode:
-  hadoop-mysql:
+  jupyter-scripts:
   jupyter-data:
+  airflow-dags:
+  airflow-logs:
+  airflow-plugins:

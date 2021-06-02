@@ -6,9 +6,9 @@ apt install -y mysql-client
 ./build/env/bin/pip install --upgrade SQLAlchemy
 
 maxcounter=45
- 
+
 counter=1
-while ! mysql -h "database" -u "user" -p"secret" -e "show databases;" > /dev/null 2>&1; 
+while ! mysql -h ${DB_HOST} -u${DB_USER} -p${DB_PASSWORD} -e "show databases;" > /dev/null 2>&1;
 do
 	echo "waiting database..."
     sleep 10

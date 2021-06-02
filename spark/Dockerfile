@@ -42,6 +42,7 @@ RUN pip3 install pyspark==2.4.4
 RUN apt-get install -y scala
 
 # To Install Jupyter
+RUN apt-get update -y
 RUN pip3 install --upgrade pip
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
@@ -58,13 +59,18 @@ RUN echo "from IPython.lib import passwd;c.NotebookApp.password = passwd('secret
 # To install graphviz
 RUN apt install -y graphviz
 
+# To install GDAL
+RUN apt update && apt install -y libgdal-dev gdal-bin
+
+RUN pip3 install GDAL==$(gdal-config --version) --global-option=build_ext --global-option="-I/usr/include/gdal"
+
 # BASH FILES
 COPY ./bash_files/* /root/
 
 # COPY ENVIROMENT VARIABLES
-COPY ./spark-env.sh ./spark/conf/
-COPY ./spark-defaults.conf ./spark/conf/
-COPY ./getGpusResources.sh ./spark/conf/
+#COPY ./spark-env.sh ./spark/conf/
+#COPY ./spark-defaults.conf ./spark/conf/
+#COPY ./getGpusResources.sh ./spark/conf/
 
 # ENTRYPOINT
 COPY ./docker-entrypoint.sh docker-entrypoint.sh
