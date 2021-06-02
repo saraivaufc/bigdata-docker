@@ -79,12 +79,12 @@ $ docker-compose up -d
 | Hadoop HDFS           | hdfs://localhost:9000                                 |
 | Hadoop WEBHDFS        | http://localhost:14000/webhdfs/v1                     |
 | Hive Server2          | http://localhost:10000                                |
-| Hue                   | http://localhost:8888 (Username: hue,password: secret)|
+| Hue                   | http://localhost:8888 (username: hue,password: secret)|
 | Spark Master UI       | http://localhost:4080                                 |
 | Spark Jobs            | http://localhost:4040                                 |
 | Livy                  | http://localhost:8998                                 |
 | Jupyter notebook      | http://localhost:8899                                 |
-| AirFlow               | http://localhost:8080                                 |
+| AirFlow               | http://localhost:8080 (username: airflow,password: airflow)|
 | Flower                | http://localhost:8555                                 |
 
 # Tutorials
