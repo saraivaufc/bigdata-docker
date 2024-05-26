@@ -57,8 +57,8 @@ more-itertools==8.0.2
 munch==2.5.0
 nbconvert==5.6.1
 nbformat==5.0.3
+numpy==1.22.0
 notebook==6.4.12
-numpy==1.18.0
 oauthlib==3.1.0
 opencv-python==4.4.0.46
 opt-einsum==3.1.0
