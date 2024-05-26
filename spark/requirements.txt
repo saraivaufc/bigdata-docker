@@ -109,7 +109,7 @@ spylon-kernel==0.4.1
 ssh-import-id==5.7
 statsmodels==0.11.0
 tensorflow-estimator==2.1.0
-tensorflow-gpu==2.1.0
+tensorflow-gpu==2.9.3
 termcolor==1.1.0
 terminado==0.8.3
 testpath==0.4.4
